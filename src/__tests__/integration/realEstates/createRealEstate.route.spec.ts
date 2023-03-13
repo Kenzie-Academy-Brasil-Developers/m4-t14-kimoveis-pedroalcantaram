@@ -1,13 +1,13 @@
-import supertest from 'supertest';
-import { DataSource } from 'typeorm';
-import app from '../../../app';
-import { AppDataSource } from '../../../data-source';
-import { Address, Category, RealEstate } from '../../../entities';
-import { createRealEstateRouteMock, errorsMock, tokenMock } from '../../mocks';
+import supertest from "supertest";
+import { DataSource } from "typeorm";
+import app from "../../../app";
+import { AppDataSource } from "../../../data-source";
+import { Address, Category, RealEstate } from "../../../entities";
+import { createRealEstateRouteMock, errorsMock, tokenMock } from "../../mocks";
 
-describe('POST /realEstate', () => {
+describe("POST /realEstate", () => {
   let connection: DataSource;
-  const baseUrl: string = '/realEstate';
+  const baseUrl: string = "/realEstate";
 
   beforeAll(async () => {
     await AppDataSource.initialize()
@@ -19,7 +19,7 @@ describe('POST /realEstate', () => {
     await connection.destroy();
   });
 
-  it('Success: Must be able to create real estates - Admin token - Full body', async () => {
+  it("Success: Must be able to create real estates - Admin token - Full body", async () => {
     const { categoryToCreate, ...payload } =
       createRealEstateRouteMock.realEstateComplete;
 
@@ -29,21 +29,20 @@ describe('POST /realEstate', () => {
 
     const response = await supertest(app)
       .post(baseUrl)
-      .set('Authorization', `Bearer ${tokenMock.genToken(true, 1)}`)
+      .set("Authorization", `Bearer ${tokenMock.genToken(true, 1)}`)
       .send({ ...payload, categoryId: category.id });
 
     const expectResults = {
       status: 201,
       expectBody: { ...payload, category },
     };
-
     expect(response.status).toBe(expectResults.status);
     expect(response.body).toEqual(
       expect.objectContaining(expectResults.expectBody)
     );
   });
 
-  it('Success: Must be able to create real estates - Admin token - Without address number', async () => {
+  it("Success: Must be able to create real estates - Admin token - Without address number", async () => {
     const { categoryToCreate, address, ...realEstateInfo } =
       createRealEstateRouteMock.realEstateAddressWithoutNumber;
 
@@ -55,7 +54,7 @@ describe('POST /realEstate', () => {
 
     const response = await supertest(app)
       .post(baseUrl)
-      .set('Authorization', `Bearer ${tokenMock.genToken(true, 1)}`)
+      .set("Authorization", `Bearer ${tokenMock.genToken(true, 1)}`)
       .send({
         ...realEstateInfo,
         address: addressInfo,
@@ -73,7 +72,7 @@ describe('POST /realEstate', () => {
     );
   });
 
-  it('Error: Must not be able to create real estates - Admin token - Unique address', async () => {
+  it("Error: Must not be able to create real estates - Admin token - Unique address", async () => {
     const { categoryToCreate, ...payload } =
       createRealEstateRouteMock.realEstateUnique;
 
@@ -88,19 +87,19 @@ describe('POST /realEstate', () => {
 
     const response = await supertest(app)
       .post(baseUrl)
-      .set('Authorization', `Bearer ${tokenMock.genToken(true, 1)}`)
+      .set("Authorization", `Bearer ${tokenMock.genToken(true, 1)}`)
       .send({ ...payload, categoryId: category.id });
 
     const expectResults = {
       status: 409,
-      expectBody: { message: 'Address already exists' },
+      expectBody: { message: "Address already exists" },
     };
 
     expect(response.status).toBe(expectResults.status);
     expect(response.body).toEqual(expectResults.expectBody);
   });
 
-  it('Error: Must not be able to create real estates - Admin token - Invalid body', async () => {
+  it("Error: Must not be able to create real estates - Admin token - Invalid body", async () => {
     const { categoryToCreate, ...realEstateInfo } =
       createRealEstateRouteMock.realEstateInvalidBody;
 
@@ -110,7 +109,7 @@ describe('POST /realEstate', () => {
 
     const response = await supertest(app)
       .post(baseUrl)
-      .set('Authorization', `Bearer ${tokenMock.genToken(true, 1)}`)
+      .set("Authorization", `Bearer ${tokenMock.genToken(true, 1)}`)
       .send({ ...realEstateInfo, categoryId: category.id });
 
     const expectResults = {
@@ -118,12 +117,12 @@ describe('POST /realEstate', () => {
       expectBody: {
         message: {
           address: [
-            'Expected string, received array',
-            'String must contain at most 8 character(s)',
-            'Expected string, received object',
-            'String must contain at most 2 character(s)',
+            "Expected string, received array",
+            "String must contain at most 8 character(s)",
+            "Expected string, received object",
+            "String must contain at most 2 character(s)",
           ],
-          size: ['Number must be greater than 0'],
+          size: ["Number must be greater than 0"],
         },
       },
     };
@@ -132,7 +131,7 @@ describe('POST /realEstate', () => {
     expect(response.body).toStrictEqual(expectResults.expectBody);
   });
 
-  it('Error: Must not be able to create real estates - Admin token - Invalid body 2', async () => {
+  it("Error: Must not be able to create real estates - Admin token - Invalid body 2", async () => {
     const { categoryToCreate, ...realEstateInfo } =
       createRealEstateRouteMock.realEstateInvalidBody2;
 
@@ -142,15 +141,15 @@ describe('POST /realEstate', () => {
 
     const response = await supertest(app)
       .post(baseUrl)
-      .set('Authorization', `Bearer ${tokenMock.genToken(true, 1)}`)
+      .set("Authorization", `Bearer ${tokenMock.genToken(true, 1)}`)
       .send({ ...realEstateInfo, categoryId: category.id });
 
     const expectResults = {
       status: 400,
       expectBody: {
         message: {
-          address: ['Required'],
-          size: ['Required'],
+          address: ["Required"],
+          size: ["Required"],
         },
       },
     };
@@ -159,7 +158,7 @@ describe('POST /realEstate', () => {
     expect(response.body).toStrictEqual(expectResults.expectBody);
   });
 
-  it('Error: Must be not able to create real estates - User token', async () => {
+  it("Error: Must be not able to create real estates - User token", async () => {
     const { categoryToCreate, address, ...realEstateInfo } =
       createRealEstateRouteMock.realEstateAddressWithoutNumber;
 
@@ -171,7 +170,7 @@ describe('POST /realEstate', () => {
 
     const response = await supertest(app)
       .post(baseUrl)
-      .set('Authorization', `Bearer ${tokenMock.genToken(false, 1)}`)
+      .set("Authorization", `Bearer ${tokenMock.genToken(false, 1)}`)
       .send({
         ...realEstateInfo,
         address: addressInfo,
@@ -182,7 +181,7 @@ describe('POST /realEstate', () => {
     expect(response.body).toEqual(errorsMock.forbidden.error);
   });
 
-  it('Error: Must be not able to create real estates - Missing bearer', async () => {
+  it("Error: Must be not able to create real estates - Missing bearer", async () => {
     const { categoryToCreate, address, ...realEstateInfo } =
       createRealEstateRouteMock.realEstateAddressWithoutNumber;
 
@@ -204,7 +203,7 @@ describe('POST /realEstate', () => {
     expect(response.body).toEqual(errorsMock.missingBearer.error);
   });
 
-  it('Error: Must be not able to create real estates - Invalid signature', async () => {
+  it("Error: Must be not able to create real estates - Invalid signature", async () => {
     const { categoryToCreate, address, ...realEstateInfo } =
       createRealEstateRouteMock.realEstateAddressWithoutNumber;
 
@@ -216,7 +215,7 @@ describe('POST /realEstate', () => {
 
     const response = await supertest(app)
       .post(baseUrl)
-      .set('Authorization', `Bearer ${tokenMock.invalidSignature}`)
+      .set("Authorization", `Bearer ${tokenMock.invalidSignature}`)
       .send({
         ...realEstateInfo,
         address: addressInfo,
@@ -227,7 +226,7 @@ describe('POST /realEstate', () => {
     expect(response.body).toEqual(errorsMock.invalidSignature.error);
   });
 
-  it('Error: Must be not able to create real estates - JWT malformed', async () => {
+  it("Error: Must be not able to create real estates - JWT malformed", async () => {
     const { categoryToCreate, address, ...realEstateInfo } =
       createRealEstateRouteMock.realEstateAddressWithoutNumber;
 
@@ -239,7 +238,7 @@ describe('POST /realEstate', () => {
 
     const response = await supertest(app)
       .post(baseUrl)
-      .set('Authorization', `Bearer ${tokenMock.jwtMalformed}`)
+      .set("Authorization", `Bearer ${tokenMock.jwtMalformed}`)
       .send({
         ...realEstateInfo,
         address: addressInfo,
